@@ -20,8 +20,22 @@ async def signup(U: SignupSchema):
 @router.post("/signin")
 async def signin(U: SigninSchema):
     async with httpx.AsyncClient() as client:
-        response = await client.post(SPRING_URL + "/user/signin", json=U.model_dump())
-    return response.json()
+        response = await client.post(
+            f"{SPRING_URL}/user/signin",
+            json=U.model_dump()
+        )
+
+    print("Signin Status:", response.status_code)
+    print("Signin Response:", response.text)
+
+    try:
+        return response.json()
+    except Exception:
+        return {
+            "success": False,
+            "status_code": response.status_code,
+            "message": response.text
+        }
 
 @router.get("/rbac")
 async def rbac(Token: str = Header(...)):
